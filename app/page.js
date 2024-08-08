@@ -3,6 +3,9 @@ import { Box, Button, Stack, TextField } from "@mui/material";
 import { Readex_Pro } from "next/font/google";
 import Image from "next/image";
 import { useState } from "react";
+import redFlameGradientLogo from '/app/assets/red_flame_gradient_logo_3.jpg';
+import aiAvatar from '/app/assets/aiAvatarChatbot.png';
+
 
 export default function Home() {
   const [messages, setMessages] = useState([{
@@ -53,6 +56,7 @@ export default function Home() {
 
 
   return (
+    
     <Box 
       width="100vw"
       height="100vh"
@@ -78,13 +82,27 @@ export default function Home() {
           >
             {
               messages.map((message, index) => (
-                <Box key={index} display="flex" justifyContent={message.role === 'assistant' ? 'flex-start' : 'flex-end'}>
-                  <Box bgcolor={
-                    message.role === 'assistant' ? 'primary.main' : 'secondary.main'
-                  }
-                  color="white"
-                  borderRadius={16}
-                  p={3}
+                <Box 
+                  key={index} 
+                  display="flex" 
+                  justifyContent={message.role === 'assistant' ? 'flex-start' : 'flex-end'}
+                  alignItems="center"
+                >
+                  {message.role === 'assistant' && (
+                    <Image 
+                      src={aiAvatar} 
+                      alt="red_flame_gradient_logo" 
+                      width={60} 
+                      height={60} 
+                    />
+                  )}
+                  <Box
+                    bgcolor={message.role === 'assistant' ? '#FCD19C' : 'grey'}
+                    color="black"
+                    borderRadius={16}
+                    p={3}
+                    ml={message.role === 'assistant' ? 2 : 0}
+                    mr={message.role === 'assistant' ? 0 : 2}
                   >
                     {message.content}
                   </Box>
@@ -98,7 +116,7 @@ export default function Home() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
-            <Button variant="contained" onClick={sendMessage}>Send</Button>
+            <Button variant="contained" style={{backgroundColor: '#000000'}} onClick={sendMessage}>Send</Button>
           </Stack>
         </Stack>
       </Box>
