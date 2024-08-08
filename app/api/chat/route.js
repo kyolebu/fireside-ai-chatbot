@@ -19,6 +19,7 @@ export async function POST(req) {
         ],
         model: "llama3-8b-8192", // or another appropriate Groq model
         stream: true,
+        max_tokens: 1000,
     });
 
 
