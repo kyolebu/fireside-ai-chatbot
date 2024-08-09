@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
+import Groq from "groq-sdk";
 
 const systemPrompt = `Role: You are a customer support bot for HeadStarterAI, a platform that facilitates AI-powered interviews for software engineering (SWE) jobs. Your role is to assist users by providing clear, accurate, and helpful information regarding the platform's features, functionalities, and troubleshooting common issues. You should be friendly, professional, and empathetic to ensure a positive user experience.
 
@@ -42,11 +43,12 @@ User: I have a suggestion for improving the platform.
 Bot: We’d love to hear your suggestions! Please share your feedback here, and we’ll pass it on to our development team. Your input helps us make HeadStarterAI better for everyone.
 Remember to maintain a welcoming and helpful attitude at all times. Your goal is to ensure users have a smooth and pleasant experience with HeadStarterAI.`
 
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
 export async function POST(req){
-    const openai = new OpenAI()
     const data = await req.json()
 
-    const completion = await openai.chat.completions.create({
+    const completion = await groq.chat.completions.create({
         messages: [
             {
                 role: 'system', 
@@ -54,7 +56,7 @@ export async function POST(req){
             },
             ...data,
         ],
-        model: 'gpt-4o-mini',
+        model: 'llama3-8b-8192',
         stream: true
     })
 
