@@ -9,78 +9,28 @@ const pc = new Pinecone({
 
 const inference = new HfInference(process.env.HUGGINGFACE_API_KEY); // replace with your actual API key
 
-// async function getEmbeddings(userQuery) {
-//     const result = await inference.featureExtraction({
-//         model: 'jinaai/jina-embeddings-v2-base-en',
-//         inputs: userQuery
-//     });
-
-//     return result;
-// }
-
-// const userQuery = "user query";
-// getEmbeddings(userQuery).then(embeddings => {
-//     console.log(embeddings);
-// });
-
-// await pc.createIndex({
-//     name: 'quickstart',
-//     dimension: 8, // Replace with your model dimensions
-//     metric: 'euclidean', // Replace with your model metric
-//     spec: { 
-//         serverless: { 
-//             cloud: 'aws', 
-//             region: 'us-east-1' 
-//         }
-//     } 
-// });
-
 // Embed and upsert a document
 async function upsertDocument(documentText, documentId) {
+    console.log("Document", documentText)
     const documentEmbedding = await inference.featureExtraction({
         model: "jinaai/jina-embeddings-v2-base-en",
-        input: [documentText]
+        inputs: documentText
     });
     
-    const embeddingVector = documentEmbedding[0];
-
     const upsertData = [
         {
             id: documentId,  // Unique ID for the document
-            values: embeddingVector,  // Embedding vector should be an array of numbers
+            values: documentEmbedding,  // Embedding vector should be an array of numbers
             metadata: {
                 content: documentText
             }
         }
     ];
 
-    await pc.upsert({
-        indexName: 'chatbot',
-        vectors: upsertData
-    });
+    await pc.index("chatbot").namespace("webinfo1").upsert(
+        upsertData
+    );
 }
-
-// // Query for relevant documents
-// async function queryRelevantDocuments(userQuery) {
-//     const userEmbedding = await inference.featureExtraction({
-//         model: "jinaai/jina-embeddings-v2-base-en",
-//         input: userQuery
-//     });
-
-//     const retrievalResponse = await pinecone.query({
-//         topK: 5,
-//         vector: userEmbedding.embedding,
-//         includeMetadata: true,
-//     });
-
-//     const relevantDocs = retrievalResponse.matches.map(match => match.metadata.content).join(' ');
-//     return relevantDocs;
-// }
-
-// const userQuery = "What is this document about?";
-// const relevantDocuments = await queryRelevantDocuments(userQuery);
-
-// console.log("Relevant documents:", relevantDocuments);
 
 async function ensureIndexExists(indexName) {
     const indexes = await pc.listIndexes();
@@ -125,20 +75,23 @@ export async function POST(req) {
     //                     Who can I contact if I have complaints or concerns?\
     //                     For complaints or concerns, please reach out to our support team through the 'Help' section. We will address your issues promptly."
 
-    // await upsertDocument(documentText, "1");
+    const documentText = "Pricing plan is only $10 per month and its billed monthly. There are no other plans"
+
+    await upsertDocument(documentText, "1");
 
     // Step 1: Embed the user's query
     const result = await inference.featureExtraction({
         model: 'jinaai/jina-embeddings-v2-base-en',
         inputs: userQuery
     });
+    console.log(userQuery)
 
     console.log(result)
 
-    ensureIndexExists('chatbot')
+    await ensureIndexExists('chatbot')
 
     // Step 2: Retrieve relevant documents from Pinecone
-    const retrievalResponse = await pc.index('chatbot').namespace('webinfo').query({
+    const retrievalResponse = await pc.index('chatbot').namespace('webinfo1').query({
         topK: 5,
         vector: result,
         includeMetadata: true,
