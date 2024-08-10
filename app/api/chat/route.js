@@ -4,7 +4,7 @@ import { Pinecone } from '@pinecone-database/pinecone';
 import { HfInference } from '@huggingface/inference';
 
 const pc = new Pinecone({
-  apiKey: '7e243908-0633-4d17-9449-d3f2f92c7831'
+  apiKey: process.env.PINECONE_API_KEY
 });
 
 const inference = new HfInference(process.env.HUGGINGFACE_API_KEY); // replace with your actual API key
@@ -13,7 +13,7 @@ const inference = new HfInference(process.env.HUGGINGFACE_API_KEY); // replace w
 async function upsertDocument(documentText, documentId) {
     console.log("Document", documentText)
     const documentEmbedding = await inference.featureExtraction({
-        model: "jinaai/jina-embeddings-v2-base-en",
+        model: "sentence-transformers/all-MiniLM-L6-v2",
         inputs: documentText
     });
     
@@ -27,7 +27,7 @@ async function upsertDocument(documentText, documentId) {
         }
     ];
 
-    await pc.index("chatbot").namespace("webinfo1").upsert(
+    await pc.index("chatbot2").namespace("webinfo2").upsert(
         upsertData
     );
 }
@@ -38,7 +38,7 @@ async function ensureIndexExists(indexName) {
         console.log(`Index ${indexName} does not exist. Creating index...`);
         await pc.createIndex({
             name: indexName,
-            dimension: 768, // Depends on your embedding model
+            dimension: 384, // Depends on your embedding model
             metric: 'cosine', // Choose the appropriate metric (cosine, euclidean, etc.)
             spec: { 
                 serverless: { 
@@ -62,36 +62,30 @@ export async function POST(req) {
     const data = await req.json();
     const userQuery = data[data.length - 1].content;
 
-    // const documentText = "How do I create an account ?\
-    //                     To create an account, simply sign in via google authentication\
-    //                     What is the pricing plan?\
-    //                     $10 per month\
-    //                     How do I report a technical issue?\
-    //                     To report a technical issue, go to the 'Help' section of our website and submit a support ticket. Provide detailed information about the issue, and our support team will assist you as soon as possible.\
-    //                     How can I update my profile information?\
-    //                     Log into your account and go to the 'Profile' section. Here, you can update your personal details, resume, and other relevant information.\
-    //                     How can I provide feedback about the platform?\
-    //                     We value your feedback! Go to the 'Feedback' section on our website and submit your comments or suggestions. Your input helps us improve our services.\
-    //                     Who can I contact if I have complaints or concerns?\
-    //                     For complaints or concerns, please reach out to our support team through the 'Help' section. We will address your issues promptly."
+     const documentText = " To create an account, simply sign in via google authentication.\
+                         Pricing plan is only $10 per month and its billed monthly. There are no other plans.\
+                         To report a technical issue, go to the 'Help' section of our website and submit a support ticket. Provide detailed information about the issue, and our support team will assist you as soon as possible.\
+                         Log into your account and go to the 'Profile' section. Here, you can update your personal details, resume, and other relevant information.\
+                         We value your feedback! Go to the 'Feedback' section on our website and submit your comments or suggestions. Your input helps us improve our services.\
+                         For complaints or concerns, please reach out to our support team through the 'Help' section. We will address your issues promptly."
 
-    const documentText = "Pricing plan is only $10 per month and its billed monthly. There are no other plans"
+    //const documentText = "Pricing plan is only $10 per month and its billed monthly. There are no other plans"
 
     await upsertDocument(documentText, "1");
 
     // Step 1: Embed the user's query
     const result = await inference.featureExtraction({
-        model: 'jinaai/jina-embeddings-v2-base-en',
+        model: 'sentence-transformers/all-MiniLM-L6-v2',
         inputs: userQuery
     });
     console.log(userQuery)
 
     console.log(result)
 
-    await ensureIndexExists('chatbot')
+    await ensureIndexExists('chatbot2')
 
     // Step 2: Retrieve relevant documents from Pinecone
-    const retrievalResponse = await pc.index('chatbot').namespace('webinfo1').query({
+    const retrievalResponse = await pc.index('chatbot2').namespace('webinfo2').query({
         topK: 5,
         vector: result,
         includeMetadata: true,
@@ -111,12 +105,15 @@ export async function POST(req) {
             ...data,
             {
                 role: "assistant",
-                content: `Relevant Information: ${relevantDocs}`
-            }
+                content: `Base your answers ONLY off of the relevant information and nothing else.Relevant Information: ${relevantDocs}`
+            },
+            {
+                role: 'user',
+                content: userQuery },
         ],
         model: "llama3-8b-8192", // or another appropriate Groq model
         stream: true,
-        max_tokens: 1000,
+        max_tokens: 500,
     });
 
 
