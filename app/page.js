@@ -6,6 +6,9 @@ import aiAvatar from '/app/assets/aiAvatarChatbot.png';
 import ChatIcon from '@mui/icons-material/Chat';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { keyframes } from '@mui/material/styles';
+
 
 const theme = createTheme({
   palette: {
@@ -38,7 +41,7 @@ const theme = createTheme({
 export default function ChatbotInterface() {
   const [messages, setMessages] = useState([{
     role: 'assistant',
-    content: 'Hi! I am an AI assistant. How can I help you today?'
+    content: "Hi! I'm Fireside, your personal assistant. How can I help you today?"
   }]);
 
   const [message, setMessage] = useState('');
@@ -96,7 +99,30 @@ export default function ChatbotInterface() {
       ]);
     }
   };
-
+  const pulseAnimation = keyframes`
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+`;
+const appear = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px); /* Optional: adds a slight upward movement */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
   return (
     <ThemeProvider theme={theme}>
       <Box 
@@ -105,16 +131,95 @@ export default function ChatbotInterface() {
         display="flex" 
         flexDirection="column" 
         alignItems="center"
-        justifyContent="center"
+        justifyContent="top"
         bgcolor="background.default"
+        paddingTop={5}
+        
       >
-        <Typography variant="h2" component="h1" color="primary" gutterBottom>
-          Fireside.ai Chatbot Demo
+        <Typography variant="h2" component="h1" color="primary" gutterBottom             sx={{
+              animation: `${appear} 3s ease-out` // Apply the fade-in animation
+            }}>
+          Fireside.ai Chatbot
         </Typography>
         
-        <Typography variant="h5" color="text.secondary" paragraph textAlign="center">
-          Experience the power of AI conversation.<br/>Click the chat icon to get started.
-        </Typography>
+ 
+
+        <Box
+          width="100%"
+          height='50%'
+          display="flex"
+          justifyContent="center"
+          gap={10}
+          mt={4}
+        >
+          <Box
+            width="35%"
+            bgcolor="#E0E0E0" // Light grey background
+            borderRadius={2}
+            p={3}
+            boxShadow={2}
+            textAlign="center"
+            sx={{
+              animation: `${appear} 3s ease-out` // Apply the fade-in animation
+            }}
+          >
+    <Typography variant="h6" color="black" fontWeight="bold">
+      What is FiresideAI?
+    </Typography>
+    <Typography variant="body1" color="black" mt={2}>
+      FiresideAI is an innovative platform designed to enhance your interview preparation. It provides AI-powered solutions to help you prepare effectively, offering various interview types and detailed feedback to track your progress. 
+      <br /><br />
+      What sets us apart is our robust AI avatar experience, utilizing Cartesia Sonic's generative audio technology. This ensures a dynamic and realistic interaction, making your preparation more engaging and effective.
+    </Typography>
+          </Box>
+          
+          <Box
+            width="35%"
+            bgcolor="#E0E0E0" // Light grey background
+            borderRadius={2}
+            p={3}
+            boxShadow={2}
+            textAlign="center"
+            sx={{
+              animation: `${appear} 3s ease-out` // Apply the fade-in animation
+            }}
+          >
+          <Typography variant="h6" color="black" fontWeight="bold">
+            Meet Your Chatbot Assistant
+          </Typography>
+          <Typography variant="body1" color="black" mt={2}>
+            Our chatbot is here to assist you with navigating the site and answering any questions about FiresideAI. As FiresideAI is currently in development, feel free to ask the chatbot anything to learn more about our features and what’s coming next.
+            <br /><br />
+            If you’re interested in staying updated, click below to join the waitlist!
+            <br></br>
+            <br></br>
+            <Button variant="contained" style={{ backgroundColor: '#FCD19C', color:'black'}} onClick={sendMessage}>Join Waitlist</Button>
+          </Typography>
+          </Box>
+        </Box>
+
+        {!isChatOpen && (
+          <Box
+            sx={{
+              position: 'fixed', // Use 'fixed' to keep the arrow in a specific position relative to the viewport
+              bottom: 100, // Adjust to place the arrow slightly above the bottom
+              right: 100, // Adjust to place the arrow slightly left from the right edge
+              zIndex: 10,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transform: 'rotate(45deg)', // Rotate the arrow to point towards the chat icon
+            }}
+          >
+            <ArrowForwardIcon
+              sx={{
+                fontSize: 150,
+                color: '#FCD19C',
+                animation: `${pulseAnimation} 1.5s infinite `, // Apply the pulsing animation
+              }}
+            />
+          </Box>
+        )}
 
         {/* Floating Chatbot Icon */}
 {/* Conditionally render the Floating Chatbot Icon */}
@@ -166,7 +271,7 @@ export default function ChatbotInterface() {
               left: 8,
             }}
           >
-            <CloseIcon />
+            <CloseIcon sx={{ color: 'white' }} />
           </IconButton>
 
           <Stack
@@ -181,6 +286,7 @@ export default function ChatbotInterface() {
               flexGrow={1}
               overflow="auto"
               maxHeight="100%"
+              pr={2}
             >
               {messages.map((message, index) => (
                 <Box
