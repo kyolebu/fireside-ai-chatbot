@@ -222,12 +222,13 @@ export default function ChatbotInterface() {
           justifyContent="center"
           alignItems="center"
           flexDirection={{ xs: 'column', md: 'row' }}
-          gap={10}
+          gap={8}
           mt={4}
         >
           <Box
             width="90%"
-            maxWidth="600px"
+            maxWidth="500px"
+            height="400px"
             bgcolor="#E0E0E0" // Light grey background
             borderRadius={2}
             p={3}
@@ -251,7 +252,8 @@ export default function ChatbotInterface() {
           
           <Box
             width="90%"
-            maxWidth="400px"
+            maxWidth="500px"
+            height="400px"
             bgcolor="#E0E0E0" // Light grey background
             borderRadius={2}
             p={{ xs: 2, sm: 3 }}
