@@ -14,7 +14,7 @@ const inference = new HfInference(process.env.HUGGINGFACE_API_KEY); // replace w
 
 // Embed and upsert a document
 async function upsertDocument(documentText, documentId) {
-    console.log("Document", documentText)
+    // console.log("Document", documentText)
     const documentEmbedding = await inference.featureExtraction({
         model: "sentence-transformers/all-MiniLM-L6-v2",
         inputs: documentText
@@ -34,7 +34,7 @@ async function upsertDocument(documentText, documentId) {
         const response = await pc.index("chatbot2").namespace("webinfo1").upsert(
             upsertData
         );
-        console.log("Upsert response:", response);
+        // console.log("Upsert response:", response);
     } catch (error) {
         console.error("Error upserting document:", error);
     }
@@ -86,9 +86,9 @@ export async function POST(req) {
     const allSplits = await textSplitter.splitDocuments(docs);
     console.log("Total splits:", allSplits.length);
 
-    allSplits.forEach((split, index) => {
-        console.log(`Split ${index + 1}:`, split.pageContent);
-    });
+    // allSplits.forEach((split, index) => {
+    //     console.log(`Split ${index + 1}:`, split.pageContent);
+    // });
 
     console.log("Upserting document splits...");
 
@@ -104,9 +104,9 @@ export async function POST(req) {
         model: 'sentence-transformers/all-MiniLM-L6-v2',
         inputs: userQuery
     });
-    console.log(userQuery)
+    console.log("User Query: ", userQuery)
 
-    console.log(queryEmbedding)
+    // console.log(queryEmbedding)
 
     // Step 2: Retrieve relevant documents from Pinecone
     const retrievalResponse = await pc.index('chatbot2').namespace('webinfo1').query({
@@ -117,7 +117,7 @@ export async function POST(req) {
     });
 
     const relevantDocs = retrievalResponse.matches.map(match => match.metadata.content).join(' ');
-    console.log("Relevant documents:", relevantDocs);
+    // console.log("Relevant documents:", relevantDocs);
 
     // Step 3: Pass the relevant documents and user's query to the generative model
     const completion = await groq.chat.completions.create({
@@ -141,6 +141,7 @@ export async function POST(req) {
         max_tokens: 500,
     });
 
+    console.log("LLM response before stream: ", completion)
 
     const stream = new ReadableStream({
         async start(controller) {
@@ -161,5 +162,8 @@ export async function POST(req) {
             }
         }
     })
+
+    console.log("LLM response after stream: ", stream)
+
     return new NextResponse(stream)
 }

@@ -38,6 +38,83 @@ const theme = createTheme({
   },
 });
 
+const pulseAnimation = keyframes`
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+`;
+const appear = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px); /* Optional: adds a slight upward movement */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const typingAnimation = keyframes`
+  0% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(-10px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 0.5; }
+`;
+
+const PendingBubble = () => (
+  <Box
+    sx={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: 60,
+      height: 30,
+      bgcolor: '#FCD19C',
+      borderRadius: '16px',
+      animation: `${typingAnimation} 1s infinite`,
+    }}
+  >
+    <Box
+      sx={{
+        width: 8,
+        height: 8,
+        bgcolor: 'black',
+        borderRadius: '50%',
+        margin: '0 4px',
+        animation: `${typingAnimation} 1.5s infinite`,
+      }}
+    />
+    <Box
+      sx={{
+        width: 8,
+        height: 8,
+        bgcolor: 'black',
+        borderRadius: '50%',
+        margin: '0 4px',
+        animation: `${typingAnimation} 1.5s infinite`,
+      }}
+    />
+    <Box
+      sx={{
+        width: 8,
+        height: 8,
+        bgcolor: 'black',
+        borderRadius: '50%',
+        margin: '0 4px',
+        animation: `${typingAnimation} 1.5s infinite`,
+      }}
+    />
+  </Box>
+);
+
 export default function ChatbotInterface() {
   const [messages, setMessages] = useState([{
     role: 'assistant',
@@ -49,12 +126,14 @@ export default function ChatbotInterface() {
   const togglePopup = () => {
     setIsChatOpen(prevIsChatOpen => !prevIsChatOpen);
   };
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [showButton, setShowButton] = useState(true);
 
   const sendMessage = async () => {
     if (!message.trim()) return;
     
+    setLoading(true);
     setMessage('');
     setMessages((prevMessages) => [
       ...prevMessages,
@@ -79,6 +158,7 @@ export default function ChatbotInterface() {
         if (done) break;
         
         const text = decoder.decode(value, { stream: true });
+        console.log("LLM response: ", text)
         setMessages((prevMessages) => {
           const lastMessage = prevMessages[prevMessages.length - 1];
           const updatedMessages = prevMessages.slice(0, -1);
@@ -97,32 +177,11 @@ export default function ChatbotInterface() {
         ...prevMessages,
         { role: "assistant", content: "Sorry, I encountered an error. Please try again." },
       ]);
+    } finally {
+      setLoading(false);
     }
   };
-  const pulseAnimation = keyframes`
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.2);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-`;
-const appear = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(20px); /* Optional: adds a slight upward movement */
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
+
   return (
     <ThemeProvider theme={theme}>
       <Box 
@@ -310,7 +369,7 @@ const appear = keyframes`
                     ml={message.role === 'assistant' ? 2 : 0}
                     mr={message.role === 'assistant' ? 0 : 2}
                   >
-                    {message.content}
+                    {message.content || (loading && <PendingBubble />)}
                   </Box>
                 </Box>
               ))}
