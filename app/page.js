@@ -8,6 +8,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { keyframes } from '@mui/material/styles';
+import Helmet from "react-helmet";
 
 
 const theme = createTheme({
@@ -193,7 +194,9 @@ const appear = keyframes`
             If you’re interested in staying updated, click below to join the waitlist!
             <br></br>
             <br></br>
+            <a href="https://getwaitlist.com/waitlist/19424" target="_blank" rel="noreferrer">
             <Button variant="contained" style={{ backgroundColor: '#FCD19C', color:'black'}} onClick={sendMessage}>Join Waitlist</Button>
+            </a>
           </Typography>
           </Box>
         </Box>
