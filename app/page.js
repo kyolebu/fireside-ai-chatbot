@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 import { Box, Button, Stack, Typography, TextField, IconButton, Fab } from "@mui/material";
 import Image from "next/image";
