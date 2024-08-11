@@ -74,25 +74,17 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 export async function POST(req) {
     const data = await req.json();
     const userQuery = data[data.length - 1].content;
-
-    const documentText = `
-                        /To create an account, simply sign in via google authentication.
-                        /To report a technical issue, go to the 'Help' section of our website and submit a support ticket. Provide detailed information about the issue, and our support team will assist you as soon as possible.
-                        /To update my profile information, log into your account and go to the 'Profile' section. Here, you can update your personal details, resume, and other relevant information.
-                        /To provide feedback about the platform, we value your feedback! Go to the 'Feedback' section on our website and submit your comments or suggestions. Your input helps us improve our services.
-                        /For complaints or concerns, please reach out to our support team through the 'Help' section. We will address your issues promptly.
-                        /The pricing plan is $10 per month.
-                        `;
+    const fs = require('fs').promises;
+    const path = process.env.FILE_PATH;
     
+    const documentText = await fs.readFile(path, 'utf8');
     const docs = [new Document({ pageContent: documentText })];
-
-    // const documentText = "Pricing plan is only $10 per month and its billed monthly. There are no other plans"
 
     console.log("Splitting document text...");
     const textSplitter = new RecursiveCharacterTextSplitter({
         chunkSize: 300,
         chunkOverlap: 1,
-        separators: ["/"],
+        separators: ["."],
     });
 
     await ensureIndexExists('chatbot2')
