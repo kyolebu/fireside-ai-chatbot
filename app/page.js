@@ -186,74 +186,94 @@ export default function ChatbotInterface() {
     <ThemeProvider theme={theme}>
       <Box 
         width="100vw" 
-        height="100vh" 
+        minHeight="100vh" 
         display="flex" 
-        flexDirection="column" 
+        flexDirection= 'column'
         alignItems="center"
-        justifyContent="top"
+        justifyContent="flex-start"
         bgcolor="background.default"
         paddingTop={5}
+        paddingBottom={5}
+        sx={{
+          // Ensures padding on small screens to prevent overlap
+          paddingX: { xs: 2, sm: 4 },  // Responsive padding
+        }}
         
       >
-        <Typography variant="h2" component="h1" color="primary" gutterBottom             sx={{
-              animation: `${appear} 3s ease-out` // Apply the fade-in animation
-            }}>
-          Fireside.ai Chatbot
-        </Typography>
-        
- 
-
+        <Box>
+          <Typography 
+            variant="h2" 
+            component="h1" 
+            color="primary" 
+            gutterBottom 
+            sx={{
+                animation: `${appear} 3s ease-out`, // Apply the fade-in animation
+                textAlign: 'center',
+                marginBottom: { xs: 3, sm: 5 },  // Margin to ensure space for the grey boxes
+              }}
+            
+          >
+            Fireside.ai Chatbot
+          </Typography>
+        </Box>
         <Box
           width="100%"
-          height='50%'
           display="flex"
           justifyContent="center"
+          alignItems="center"
+          flexDirection={{ xs: 'column', md: 'row' }}
           gap={10}
           mt={4}
         >
           <Box
-            width="35%"
+            width="90%"
+            maxWidth="600px"
             bgcolor="#E0E0E0" // Light grey background
             borderRadius={2}
             p={3}
             boxShadow={2}
             textAlign="center"
             sx={{
-              animation: `${appear} 3s ease-out` // Apply the fade-in animation
+              animation: `${appear} 3s ease-out`, // Apply the fade-in animation
+              wordWrap: 'break-word',
+              overflowWrap: 'break-word',
             }}
           >
-    <Typography variant="h6" color="black" fontWeight="bold">
-      What is FiresideAI?
-    </Typography>
-    <Typography variant="body1" color="black" mt={2}>
-      FiresideAI is an innovative platform designed to enhance your interview preparation. It provides AI-powered solutions to help you prepare effectively, offering various interview types and detailed feedback to track your progress. 
-      <br /><br />
-      What sets us apart is our robust AI avatar experience, utilizing Cartesia Sonic's generative audio technology. This ensures a dynamic and realistic interaction, making your preparation more engaging and effective.
-    </Typography>
+            <Typography variant="h6" color="black" fontWeight="bold">
+              What is FiresideAI?
+            </Typography>
+            <Typography variant="body1" color="black" mt={2}>
+              FiresideAI is an innovative platform designed to enhance your interview preparation. It provides AI-powered solutions to help you prepare effectively, offering various interview types and detailed feedback to track your progress. 
+              <br /><br />
+              What sets us apart is our robust AI avatar experience, utilizing Cartesia Sonic's generative audio technology. This ensures a dynamic and realistic interaction, making your preparation more engaging and effective.
+            </Typography>
           </Box>
           
           <Box
-            width="35%"
+            width="90%"
+            maxWidth="400px"
             bgcolor="#E0E0E0" // Light grey background
             borderRadius={2}
-            p={3}
+            p={{ xs: 2, sm: 3 }}
             boxShadow={2}
             textAlign="center"
             sx={{
-              animation: `${appear} 3s ease-out` // Apply the fade-in animation
+              animation: `${appear} 3s ease-out`, // Apply the fade-in animation
+              wordWrap: 'break-word',
+              overflowWrap: 'break-word',
             }}
           >
-          <Typography variant="h6" color="black" fontWeight="bold">
-            Meet Your Chatbot Assistant
-          </Typography>
-          <Typography variant="body1" color="black" mt={2}>
-            Our chatbot is here to assist you with navigating the site and answering any questions about FiresideAI. As FiresideAI is currently in development, feel free to ask the chatbot anything to learn more about our features and what’s coming next.
-            <br /><br />
-            If you’re interested in staying updated, click below to join the waitlist!
-            <br></br>
-            <br></br>
-            <Button variant="contained" style={{ backgroundColor: '#FCD19C', color:'black'}} onClick={sendMessage}>Join Waitlist</Button>
-          </Typography>
+            <Typography variant="h6" color="black" fontWeight="bold">
+              Meet Your Chatbot Assistant
+            </Typography>
+            <Typography variant="body1" color="black" mt={2}>
+              Our chatbot is here to assist you with navigating the site and answering any questions about FiresideAI. As FiresideAI is currently in development, feel free to ask the chatbot anything to learn more about our features and what’s coming next.
+              <br /><br />
+              If you’re interested in staying updated, click below to join the waitlist!
+              <br></br>
+              <br></br>
+              <Button variant="contained" style={{ backgroundColor: '#FCD19C', color:'black'}} onClick={sendMessage}>Join Waitlist</Button>
+            </Typography>
           </Box>
         </Box>
 
@@ -261,18 +281,19 @@ export default function ChatbotInterface() {
           <Box
             sx={{
               position: 'fixed', // Use 'fixed' to keep the arrow in a specific position relative to the viewport
-              bottom: 100, // Adjust to place the arrow slightly above the bottom
-              right: 100, // Adjust to place the arrow slightly left from the right edge
+              bottom: { xs: 65, sm: 90 }, // Adjust to place the arrow slightly above the bottom
+              right: { xs: 65, sm: 90 }, // Adjust to place the arrow slightly left from the right edge
               zIndex: 10,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               transform: 'rotate(45deg)', // Rotate the arrow to point towards the chat icon
+              fontSize: { xs: '40px', sm: '60px' },  // Responsive icon size
             }}
           >
             <ArrowForwardIcon
               sx={{
-                fontSize: 150,
+                fontSize: { xs: 90, sm: 150 },
                 color: '#FCD19C',
                 animation: `${pulseAnimation} 1.5s infinite `, // Apply the pulsing animation
               }}
@@ -287,8 +308,8 @@ export default function ChatbotInterface() {
             aria-label="open chat"
             sx={{
               position: 'fixed',
-              bottom: 32,
-              right: 32,
+              bottom: { xs: 16, sm: 32 },
+              right: { xs: 16, sm: 32 },
               bgcolor: 'primary.main',
               color: 'secondary.main',
               '&:hover': { 
@@ -298,20 +319,22 @@ export default function ChatbotInterface() {
               transition: 'all 0.3s ease',
               borderRadius: '50%',
               boxShadow: 6,
-              width: 80,
-              height: 80,
+              width: { xs: 60, sm: 80 },
+              height: { xs: 60, sm: 80 },
             }}
             onClick={togglePopup}
           >
-            <ChatIcon sx={{ fontSize: 40 }} />
+            <ChatIcon sx={{ fontSize: { xs: 30, sm: 40 } }} />
           </Fab>
         )}
 
         {/* Chatbot Drawer */}
         {isChatOpen && (
         <Box
-          width="500px"
-          height="600px"
+          width="90%"
+          maxWidth="500px"
+          height="80%"
+          maxHeight="500px"
           border="1px solid black"
           position="fixed"
           bottom={16}
@@ -326,8 +349,8 @@ export default function ChatbotInterface() {
             onClick={togglePopup}
             style={{
               position: 'absolute',
-              top: 8,
-              left: 8,
+              top: 3,
+              left: 3,
             }}
           >
             <CloseIcon sx={{ color: 'white' }} />
