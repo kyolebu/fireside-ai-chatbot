@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
 import { Pinecone } from '@pinecone-database/pinecone';
 import { HfInference } from '@huggingface/inference';
-import { ChatGroq } from "@langchain/groq";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { Document } from "langchain/document";
 
@@ -10,10 +9,6 @@ const pc = new Pinecone({
   apiKey: process.env.PINECONE_API_KEY
 });
 
-// const llm = new ChatGroq({
-//     model: "mixtral-8x7b-32768",
-//     temperature: 0
-//   });
 
 const inference = new HfInference(process.env.HUGGINGFACE_API_KEY); // replace with your actual API key
 
@@ -51,8 +46,8 @@ async function ensureIndexExists(indexName) {
         console.log(`Index ${indexName} does not exist. Creating index...`);
         await pc.createIndex({
             name: indexName,
-            dimension: 384, // Depends on your embedding model
-            metric: 'cosine', // Choose the appropriate metric (cosine, euclidean, etc.)
+            dimension: 384, // Depends on embedding model
+            metric: 'cosine', // Depends on embedding model
             spec: { 
                 serverless: { 
                     cloud: 'aws', 
@@ -67,7 +62,6 @@ async function ensureIndexExists(indexName) {
 }
 
 const systemPrompt = "Welcome to FiresideAI, your go-to platform for AI-powered interviews designed for all types of jobs, including behavioral and technical interviews. At FiresideAI, we utilize advanced AI to create a real-life interview experience with a lifelike avatar, helping you prepare and excel in your job interviews. I'm here to assist you with any questions or issues you may have. How can I help you today? Key Functions: 1. Account Management: Help with creating, updating, or deleting user accounts. Assistance with password resets or account recovery. Information on subscription plans and billing inquiries. 2. Interview Preparation: Guidance on how to schedule an interview session. Explanation of different types of interviews available (behavioral, technical, etc.). Tips on how to make the most of your interview sessions. 3. Technical Support: Troubleshooting issues with the platform (e.g., login problems, video or audio issues). Assistance with uploading or managing documents and files related to interviews. Help with navigating the platform’s features and functionalities. 4. Feedback and Improvement: Collecting user feedback to improve our services. Addressing any complaints or concerns promptly." 
-
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 
@@ -98,16 +92,12 @@ export async function POST(req) {
 
     console.log("Upserting document splits...");
 
-    // Upsert each split into the index
-    // await Promise.all(allSplits.map((split, i) => upsertDocument(split.content, `doc-${i+1}`)));
-
     if (allSplits.length > 0) {
         await Promise.all(allSplits.map((split, i) => upsertDocument(split.pageContent, `doc-${i+1}`)));
     } else {
         console.warn("No splits were generated from the document text.");
     }
 
-    // await upsertDocument(documentText, "1");
 
     // Step 1: Embed the user's query
     const queryEmbedding = await inference.featureExtraction({
